@@ -1,5 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
+export type UserRole = 'creator' | 'participant' | 'admin';
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -9,7 +11,7 @@ export class User {
   @Column()
   surname: string;
   @Column({ nullable: true })
-  role: string;
+  role: UserRole;
   @Column({ unique: true })
   email: string;
   @Column()

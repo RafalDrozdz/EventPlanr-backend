@@ -12,7 +12,7 @@ import { hash, compare } from 'bcrypt';
 import { omit } from 'lodash';
 import { LoginMessages } from './auth.types';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../user/user.entity';
+import { User, UserRole } from '../user/user.entity';
 import { Response, Request } from 'express';
 import { Get } from '@nestjs/common';
 @Controller('auth')
@@ -28,7 +28,7 @@ export class AuthController {
     @Body('surname') surname: string,
     @Body('email') email: string,
     @Body('password') password: string,
-    @Body('role') role?: string,
+    @Body('role') role?: UserRole,
   ) {
     const hashedPassword = await hash(password, 12);
 

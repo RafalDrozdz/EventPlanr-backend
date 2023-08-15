@@ -1,6 +1,9 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { User } from '../user/user.entity';
 import { JwtModuleOptions } from '@nestjs/jwt';
+import { Event } from '../event/event.entity';
+import { TypeOfTicket } from '../type-of-ticket/type-of-ticket.entity';
+import { Ticket } from '../ticket/ticket.entity';
 
 require('dotenv').config();
 
@@ -38,7 +41,8 @@ class ConfigService {
       username: this.getValue('POSTGRES_USER'),
       password: this.getValue('POSTGRES_PASSWORD'),
       database: this.getValue('POSTGRES_DATABASE'),
-      entities: [User],
+      entities: [User, Event, Ticket, TypeOfTicket],
+      // Ticket, TypeOfTicket
       synchronize: true,
     };
   }
