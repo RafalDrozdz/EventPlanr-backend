@@ -34,6 +34,6 @@ export class EventController {
 
     const tickets = await Promise.all(promises);
 
-    return { ...event };
+    return { ...event, tickets };
   }
 }
