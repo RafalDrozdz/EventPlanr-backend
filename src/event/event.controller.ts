@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { CreateEventDto } from './create-event.dto';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
@@ -35,5 +35,12 @@ export class EventController {
     const tickets = await Promise.all(promises);
 
     return { ...event, tickets };
+  }
+
+  @Get(':id')
+  async get(@Param('id') id: number, @Req() request: Request) {
+    const event = await this.eventService.findOne({ where: { id } });
+
+    return { ...event };
   }
 }

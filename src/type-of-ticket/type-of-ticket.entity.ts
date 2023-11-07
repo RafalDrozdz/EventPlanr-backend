@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToOne,
-  ManyToOne,
-  OneToMany,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
 import { Event } from '../event/event.entity';
 
 @Entity('type_of_tickets')
@@ -16,9 +9,9 @@ export class TypeOfTicket {
   @Column()
   event_id: number;
   @Column()
+  title: string;
+  @Column()
   price: number;
   @Column()
-  name: string;
-  @Column()
-  description: string;
+  currency: string;
 }
