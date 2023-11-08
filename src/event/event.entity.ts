@@ -7,7 +7,7 @@ export type EventStatus = 'up_to_date' | 'cancelled';
 export class Event {
   @PrimaryGeneratedColumn()
   id: number;
-  @OneToOne(() => User, (user: User) => user.id)
+  @Column()
   creator_user_id: number;
   @Column()
   title: string;
@@ -27,6 +27,8 @@ export class Event {
   country: string;
   @Column()
   place_id: string;
+  @Column()
+  place_name: string;
   @Column({ nullable: true })
   longitude: string;
   @Column({ nullable: true })
@@ -36,23 +38,3 @@ export class Event {
   @Column({ type: 'timestamptz' })
   end_date: Date;
 }
-
-// @Entity('events')
-// export class Events {
-//   @PrimaryGeneratedColumn()
-//   id: number;
-//   @OneToOne(() => User, (user: User) => user.id)
-//   creator_user_id: number;
-//   @Column()
-//   title: string;
-//   @Column()
-//   description: string;
-//   @Column({ nullable: true })
-//   status: EventStatus;
-//   @Column()
-//   place_name: string;
-//   @Column({ type: 'timestamptz' })
-//   start_date: Date;
-//   @Column({ type: 'timestamptz' })
-//   end_date: Date;
-// }

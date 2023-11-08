@@ -14,6 +14,7 @@ export class CreateEventDto {
   postal_code: string;
   country: string;
   place_id: string;
+  place_name: string;
   longitude: string;
   latitude: string;
 }

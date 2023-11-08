@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
 import { CreateEventDto } from './create-event.dto';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
@@ -38,9 +38,12 @@ export class EventController {
   }
 
   @Get(':id')
-  async get(@Param('id') id: number, @Req() request: Request) {
-    const event = await this.eventService.findOne({ where: { id } });
+  async findOne(@Param('id') id: number, @Req() request: Request) {
+    const cookieAccessToken = request.cookies['accessToken'];
+    const user = await this.jwtService.verifyAsync(cookieAccessToken);
 
-    return { ...event };
+    const event = await this.eventService.findOne({ where: { id } });
+    const isOwner = user?.id === event.creator_user_id;
+    return { ...event, is_owner: isOwner };
   }
 }
