@@ -44,6 +44,17 @@ export class EventController {
 
     const event = await this.eventService.findOne({ where: { id } });
     const isOwner = user?.id === event.creator_user_id;
-    return { ...event, is_owner: isOwner };
+    const tickets = await this.typeOfTicket.find({
+      where: { event_id: id },
+    });
+
+    const cheapest_ticket =
+      (tickets.length &&
+        tickets.reduce((prev, curr) =>
+          (prev.price ?? 0) < (curr.price ?? 0) ? prev : curr,
+        )) ||
+      null;
+
+    return { ...event, is_owner: isOwner, tickets, cheapest_ticket };
   }
 }
