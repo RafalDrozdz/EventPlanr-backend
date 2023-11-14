@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm';
 import { User } from '../user/user.entity';
 
 export type EventStatus = 'up_to_date' | 'cancelled';
@@ -9,8 +9,10 @@ export class Event {
   id: number;
   @Column()
   creator_user_id: number;
+  @Index({ fulltext: true })
   @Column()
   title: string;
+  @Index({ fulltext: true })
   @Column()
   description: string;
   @Column()

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { CreateEventDto } from './create-event.dto';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
@@ -56,5 +56,19 @@ export class EventController {
       null;
 
     return { ...event, is_owner: isOwner, tickets, cheapest_ticket };
+  }
+
+  @Get()
+  async all(@Req() request: Request) {
+    return this.eventService.getAll();
+  }
+
+  @Get('search/:searchQuery')
+  async search(
+    @Param('searchQuery') searchQuery: string,
+    @Req() request: Request,
+  ) {
+    if (!searchQuery) return [];
+    return this.eventService.search(searchQuery);
   }
 }
