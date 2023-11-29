@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { EventService } from './event.service';
 import { TypeOfTicketService } from '../type-of-ticket/type-of-ticket.service';
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 @Controller('event')
 export class EventController {
@@ -28,11 +29,23 @@ export class EventController {
       creator_user_id: user.id,
     });
 
-    const promises = createEventDto.tickets.map((typeOfTicket) =>
+    const ticketPromises = createEventDto.tickets.map((typeOfTicket) =>
       this.typeOfTicket.create({ ...typeOfTicket, event_id: event.id }),
     );
+    const tickets = await Promise.all(ticketPromises);
 
-    const tickets = await Promise.all(promises);
+    const productPromises = tickets.map((typeOfTicket) =>
+      stripe.products.create({
+        id: typeOfTicket.id,
+        name: `${event.title} - ${typeOfTicket.title}`,
+        default_price_data: {
+          currency: typeOfTicket.currency.toLowerCase(),
+          unit_amount: typeOfTicket.price * 100,
+        },
+      }),
+    );
+
+    const products = await Promise.all(productPromises);
 
     return { ...event, tickets };
   }
