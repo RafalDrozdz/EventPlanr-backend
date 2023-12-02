@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { configService } from '../config/config.service';
 import { TypeOfTicketService } from '../type-of-ticket/type-of-ticket.service';
 import { TypeOfTicket } from '../type-of-ticket/type-of-ticket.entity';
+import { PaymentService } from '../payment/payment.service';
 
 const jwtOptions = configService.getJwtOptions();
 
@@ -16,6 +17,6 @@ const jwtOptions = configService.getJwtOptions();
     JwtModule.register(jwtOptions),
   ],
   controllers: [EventController],
-  providers: [EventService, TypeOfTicketService],
+  providers: [EventService, TypeOfTicketService, PaymentService],
 })
 export class EventModule {}

@@ -4,14 +4,16 @@ import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { EventService } from './event.service';
 import { TypeOfTicketService } from '../type-of-ticket/type-of-ticket.service';
+import { PaymentService } from '../payment/payment.service';
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 @Controller('event')
 export class EventController {
   constructor(
     private eventService: EventService,
-    private typeOfTicket: TypeOfTicketService,
+    private typeOfTicketService: TypeOfTicketService,
     private jwtService: JwtService,
+    private paymentService: PaymentService,
   ) {}
   @Post()
   async create(
@@ -30,19 +32,12 @@ export class EventController {
     });
 
     const ticketPromises = createEventDto.tickets.map((typeOfTicket) =>
-      this.typeOfTicket.create({ ...typeOfTicket, event_id: event.id }),
+      this.typeOfTicketService.create({ ...typeOfTicket, event_id: event.id }),
     );
     const tickets = await Promise.all(ticketPromises);
-
-    const productPromises = tickets.map((typeOfTicket) =>
-      stripe.products.create({
-        id: typeOfTicket.id,
-        name: `${event.title} - ${typeOfTicket.title}`,
-        default_price_data: {
-          currency: typeOfTicket.currency.toLowerCase(),
-          unit_amount: typeOfTicket.price * 100,
-        },
-      }),
+    console.log(tickets);
+    const productPromises = tickets.map((ticket) =>
+      this.paymentService.createProduct(ticket, event.title),
     );
 
     const products = await Promise.all(productPromises);
@@ -51,24 +46,18 @@ export class EventController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number, @Req() request: Request) {
+  async getEvent(@Param('id') id: number, @Req() request: Request) {
     const cookieAccessToken = request.cookies['accessToken'];
     const user = await this.jwtService.verifyAsync(cookieAccessToken);
 
     const event = await this.eventService.findOne({ where: { id } });
-    const isOwner = user?.id === event.creator_user_id;
-    const tickets = await this.typeOfTicket.find({
-      where: { event_id: id },
-    });
+    const is_owner = user?.id === event.creator_user_id;
+    const tickets = await this.typeOfTicketService.getTickets(id);
+    const cheapest_ticket = await this.typeOfTicketService.getCheapestTicket(
+      id,
+    );
 
-    const cheapest_ticket =
-      (tickets.length &&
-        tickets.reduce((prev, curr) =>
-          (prev.price ?? 0) < (curr.price ?? 0) ? prev : curr,
-        )) ||
-      null;
-
-    return { ...event, is_owner: isOwner, tickets, cheapest_ticket };
+    return { ...event, is_owner, tickets, cheapest_ticket };
   }
 
   @Get()

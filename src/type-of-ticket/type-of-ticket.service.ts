@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { TypeOfTicket } from './type-of-ticket.entity';
 
 @Injectable()
@@ -14,7 +14,17 @@ export class TypeOfTicketService {
     return this.typeOfTicketRepository.save(data);
   }
 
-  async find(condition: FindOneOptions<TypeOfTicket>): Promise<TypeOfTicket[]> {
-    return this.typeOfTicketRepository.find(condition);
+  async getTickets(event_id: number): Promise<TypeOfTicket[]> {
+    return this.typeOfTicketRepository.find({
+      where: { event_id },
+      order: { price: 'asc' },
+    });
+  }
+  // : Promise<TypeOfTicket[]>
+  async getCheapestTicket(event_id: number) {
+    return this.typeOfTicketRepository.findOne({
+      where: { event_id },
+      order: { price: 'asc' },
+    });
   }
 }

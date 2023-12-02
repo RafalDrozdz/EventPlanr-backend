@@ -11,6 +11,7 @@ import { EventModule } from '../event/event.module';
 import { Event } from '../event/event.entity';
 import { Ticket } from '../ticket/ticket.entity';
 import { TypeOfTicket } from '../type-of-ticket/type-of-ticket.entity';
+import { PaymentModule } from '../payment/payment.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { TypeOfTicket } from '../type-of-ticket/type-of-ticket.entity';
     TypeOrmModule.forFeature([User, Event, Ticket, TypeOfTicket]),
     AuthModule,
     EventModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthService, EventService],
