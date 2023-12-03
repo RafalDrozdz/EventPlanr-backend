@@ -3,17 +3,14 @@ import { CreateEventDto } from './create-event.dto';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { EventService } from './event.service';
-import { TypeOfTicketService } from '../type-of-ticket/type-of-ticket.service';
-import { PaymentService } from '../payment/payment.service';
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+import { StripeService } from '../stripe/stripe.service';
 
 @Controller('event')
 export class EventController {
   constructor(
     private eventService: EventService,
-    private typeOfTicketService: TypeOfTicketService,
     private jwtService: JwtService,
-    private paymentService: PaymentService,
+    private stripeService: StripeService,
   ) {}
   @Post()
   async create(
@@ -31,37 +28,29 @@ export class EventController {
       creator_user_id: user.id,
     });
 
-    const ticketPromises = createEventDto.tickets.map((typeOfTicket) =>
-      this.typeOfTicketService.create({ ...typeOfTicket, event_id: event.id }),
-    );
-    const tickets = await Promise.all(ticketPromises);
-    console.log(tickets);
-    const productPromises = tickets.map((ticket) =>
-      this.paymentService.createProduct(ticket, event.title),
+    const ticketPromises = createEventDto.tickets.map((ticket) =>
+      this.stripeService.createProduct(ticket, event),
     );
 
-    const products = await Promise.all(productPromises);
+    const tickets = await Promise.all(ticketPromises);
 
     return { ...event, tickets };
   }
 
   @Get(':id')
-  async getEvent(@Param('id') id: number, @Req() request: Request) {
+  async get(@Param('id') id: number, @Req() request: Request) {
     const cookieAccessToken = request.cookies['accessToken'];
     const user = await this.jwtService.verifyAsync(cookieAccessToken);
 
     const event = await this.eventService.findOne({ where: { id } });
     const is_owner = user?.id === event.creator_user_id;
-    const tickets = await this.typeOfTicketService.getTickets(id);
-    const cheapest_ticket = await this.typeOfTicketService.getCheapestTicket(
-      id,
-    );
+    const tickets = await this.stripeService.getTickets(id);
 
-    return { ...event, is_owner, tickets, cheapest_ticket };
+    return { ...event, is_owner, tickets };
   }
 
   @Get()
-  async all(@Req() request: Request) {
+  async getAll(@Req() request: Request) {
     return this.eventService.getAll();
   }
 
