@@ -37,4 +37,24 @@ export class StripeService {
 
     return response.url;
   }
+
+  async getUser(id: string) {
+    const paymentLink = await stripe.paymentLinks.retrieve(id);
+    return paymentLink.metadata;
+  }
+
+  async handlePayment(event: Stripe.Event) {
+    if (
+      event.type === 'checkout.session.completed' &&
+      event.data.object.payment_status === 'paid'
+    ) {
+      const paymentLink = await stripe.paymentLinks.retrieve(
+        event.data.object.payment_link as string,
+      );
+      const user = paymentLink.metadata;
+
+      console.log(user);
+      console.log(event);
+    }
+  }
 }
