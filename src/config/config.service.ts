@@ -7,7 +7,7 @@ import { Ticket } from '../ticket/ticket.entity';
 
 require('dotenv').config();
 
-class ConfigService {
+export class ConfigService {
   constructor(private env: { [k: string]: string | undefined }) {}
 
   private getValue(key: string, throwOnMissing = true): string {
@@ -26,6 +26,17 @@ class ConfigService {
 
   public getPort() {
     return this.getValue('PORT', true);
+  }
+
+  public getEmail() {
+    return {
+      user: this.getValue('EMAIL_LOGIN', true),
+      pass: this.getValue('EMAIL_PASSWORD', true),
+    };
+  }
+
+  public getEmailTransport() {
+    return this.getValue('MAIL_TRANSPORT', true);
   }
 
   public isProduction() {
