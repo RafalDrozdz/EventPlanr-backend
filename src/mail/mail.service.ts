@@ -10,7 +10,7 @@ export class MailService {
 
   async sendTicket(user: User, lineItems: Stripe.LineItem[], event: Event) {
     await this.mailerService.sendMail({
-      to: 'rafadrozdzlodz@gmail.com',
+      to: user.email,
       from: '"Evently" <evently.api@gmail.com>',
       subject: `Evently - Twój bilet! ${event.title}`,
       template: './ticket',
