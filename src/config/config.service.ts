@@ -35,10 +35,6 @@ export class ConfigService {
     };
   }
 
-  public getEmailTransport() {
-    return this.getValue('MAIL_TRANSPORT', true);
-  }
-
   public isProduction() {
     const mode = this.getValue('MODE', false);
     return mode != 'DEV';

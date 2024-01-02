@@ -10,13 +10,11 @@ import { TypeOfTicket } from '../type-of-ticket/type-of-ticket.entity';
 import { StripeService } from '../stripe/stripe.service';
 
 const jwtOptions = configService.getJwtOptions();
-
+const EventRepository = TypeOrmModule.forFeature([Event, TypeOfTicket]);
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Event, TypeOfTicket]),
-    JwtModule.register(jwtOptions),
-  ],
+  imports: [EventRepository, JwtModule.register(jwtOptions)],
   controllers: [EventController],
   providers: [EventService, TypeOfTicketService, StripeService],
+  exports: [EventService, EventRepository],
 })
 export class EventModule {}

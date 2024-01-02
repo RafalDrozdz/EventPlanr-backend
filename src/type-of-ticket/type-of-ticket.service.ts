@@ -14,12 +14,12 @@ export class TypeOfTicketService {
     return this.typeOfTicketRepository.save(data);
   }
 
-  async getTickets(event_id: number): Promise<TypeOfTicket[]> {
-    return this.typeOfTicketRepository.find({
-      where: { event_id },
-      order: { price: 'asc' },
-    });
-  }
+  // async getTickets(event_id: number): Promise<TypeOfTicket[]> {
+  //   return this.typeOfTicketRepository.find({
+  //     where: { event_id },
+  //     order: { price: 'asc' },
+  //   });
+  // }
   // : Promise<TypeOfTicket[]>
   async getCheapestTicket(event_id: number) {
     return this.typeOfTicketRepository.findOne({
